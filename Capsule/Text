@@ -1,0 +1,36 @@
+import bpy
+import os
+import math
+
+# CONFIGURATION
+output_base = "//renders/idle"  # Relative to .blend file
+camera_empty_name = "Camera Rig"
+angles = [0, 45, 90, 135, 180, 225, 270, 315]
+frame_start = 1
+frame_end = 12
+frame_step = 2  # Only render every 2nd frame
+
+# PREP: grab empty
+empty = bpy.data.objects[camera_empty_name]
+
+# MAIN LOOP
+for angle in angles:
+    # Rotate empty to current direction
+    empty.rotation_euler = (0, 0, math.radians(angle))
+    
+    # Generate folder for this angle
+    folder_name = f"{angle:03d}"
+    render_path = os.path.join(output_base, folder_name)
+    os.makedirs(bpy.path.abspath(render_path), exist_ok=True)
+    
+    # Frame loop: fully manual render per frame
+    for frame in range(frame_start, frame_end + 1, frame_step):
+        bpy.context.scene.frame_set(frame)
+        
+        # Build output filepath
+        filename = f"frame_{frame:03d}.png"
+        full_output_path = os.path.join(render_path, filename)
+        bpy.context.scene.render.filepath = full_output_path
+        
+        # Render single frame
+        bpy.ops.render.render(write_still=True)

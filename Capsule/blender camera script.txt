@@ -1,0 +1,48 @@
+Camera angle:
+
+LOCATION:
+X 0
+Y 9
+Z 17
+
+
+ROTATION:
+X 0
+Y 0
+Z 315
+
+
+ChatGPT convo title: Blender Camera Sprite Sheet Script
+
+
+
+
+
+import bpy
+import os
+import math
+
+# CONFIG
+output_base = "//renders/walk_"  # Relative to .blend file
+camera_empty_name = "CameraRig"  # Name of your rotating empty
+frame_start = 1
+frame_end = 12
+angles = [0, 45, 90, 135, 180, 225, 270, 315]
+
+# MAIN LOOP
+for angle in angles:
+    # Rotate the empty
+    empty = bpy.data.objects[camera_empty_name]
+    empty.rotation_euler = (0, 0, math.radians(angle))
+
+    # Format folder name
+    folder_name = f"{angle:03d}"
+    render_path = os.path.join(output_base, folder_name)
+    bpy.context.scene.render.filepath = render_path + "/"
+
+    # Set frame range
+    bpy.context.scene.frame_start = frame_start
+    bpy.context.scene.frame_end = frame_end
+
+    # Render animation to folder
+    bpy.ops.render.render(animation=True)
